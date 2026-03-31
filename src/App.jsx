@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getUsers } from './api';
+import { Button } from './components/ui/button';
 
 export default function App() {
   const [users, setUsers] = useState([]);
@@ -23,6 +24,7 @@ export default function App() {
 
   return (
     <div style={{ padding: '20px', fontFamily: 'sans-serif' }}>
+      <Button>shadcn</Button>
       <h1>Users from API</h1>
       {loading && <p>Loading users...</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
