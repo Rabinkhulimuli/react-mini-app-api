@@ -22,13 +22,38 @@ export const getUsers = async () => {
 };
 
 /**
+ * Fetches a single user by their ID from the dummy API.
+ * @param {number} userId - The ID of the user to fetch.
+ * @returns {Promise<object>} A promise that resolves to the user object.
+ */
+export const getUserById = async (userId) => {
+  try {
+    const response = await fetch(`${API_URL}/users/${userId}`);
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error(`Error fetching user with id ${userId}:`, error);
+    throw error;
+  }
+};
+
+/**
  * Creates a new user.
  * This is a simulated POST request.
  * @param {object} userData - The data for the new user (e.g., { name: 'John Doe', email: 'john@example.com' }).
  * @returns {Promise<object>} A promise that resolves to the newly created user.
  */
 export const createUser = (userData) => {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
+    if (!userData || !userData.name || !userData.email) {
+      return reject(new Error('Invalid user data: name and email are required.'));
+    }
+    if (!/^\S+@\S+\.\S+$/.test(userData.email)) {
+      return reject(new Error('Invalid email format.'));
+    }
+
     setTimeout(() => {
       const newUser = {
         ...userData,
@@ -49,6 +74,16 @@ export const createUser = (userData) => {
  */
 export const updateUser = (userId, updatedData) => {
   return new Promise((resolve, reject) => {
+    if (!updatedData || Object.keys(updatedData).length === 0) {
+      return reject(new Error('No update data provided.'));
+    }
+    if (updatedData.email && !/^\S+@\S+\.\S+$/.test(updatedData.email)) {
+      return reject(new Error('Invalid email format.'));
+    }
+    if (Object.prototype.hasOwnProperty.call(updatedData, 'id')) {
+      return reject(new Error('Updating the user ID is not allowed.'));
+    }
+
     setTimeout(() => {
       const userIndex = users.findIndex((u) => u.id === userId);
       if (userIndex > -1) {

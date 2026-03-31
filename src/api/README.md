@@ -30,7 +30,11 @@ try {
 Creates a new user.
 
 **Parameters:**
-- `userData` (object): An object containing the new user's data, like `{ name: 'Jane Doe', email: 'jane@example.com' }`.
+- `userData` (object): An object containing the new user's data. `name` and `email` are required.
+
+**Validation:**
+- Rejects if `name` or `email` are missing.
+- Rejects if the `email` format is invalid.
 
 **Example:**
 ```javascript
@@ -42,8 +46,12 @@ const newUserData = {
   email: 'jane@example.com'
 };
 
-const createdUser = await createUser(newUserData);
-console.log('User created:', createdUser);
+try {
+  const createdUser = await createUser(newUserData);
+  console.log('User created:', createdUser);
+} catch (error) {
+  console.error(error.message); // e.g., "Invalid user data: name and email are required."
+}
 ```
 
 ### `updateUser(userId, updatedData)`
@@ -54,6 +62,11 @@ Updates an existing user.
 - `userId` (number): The ID of the user to update.
 - `updatedData` (object): An object with the fields to update, e.g., `{ name: 'Jane Smith' }`.
 
+**Validation:**
+- Rejects if `updatedData` is empty.
+- Rejects if `email` is provided in an invalid format.
+- Rejects if you attempt to change the user `id`.
+
 **Example:**
 ```javascript
 import { updateUser } from './api';
@@ -63,8 +76,12 @@ const dataToUpdate = {
   name: 'Leanne "Bret" Graham'
 };
 
-const updatedUser = await updateUser(userIdToUpdate, dataToUpdate);
-console.log('User updated:', updatedUser);
+try {
+  const updatedUser = await updateUser(userIdToUpdate, dataToUpdate);
+  console.log('User updated:', updatedUser);
+} catch (error) {
+  console.error(error.message); // e.g., "Invalid email format."
+}
 ```
 
 ### `deleteUser(userId)`
@@ -83,3 +100,22 @@ const userIdToDelete = 2;
 await deleteUser(userIdToDelete);
 console.log(`User with ID ${userIdToDelete} has been deleted.`);
 ```
+
+### `getUserById(userId)`
+
+Fetches a single user by their ID.
+
+**Parameters:**
+- `userId` (number): The ID of the user to fetch.
+
+**Example:**
+```javascript
+import { getUserById } from './api';
+
+// Inside an async function or useEffect
+try {
+  const user = await getUserById(1);
+  console.log(user);
+} catch (error) {
+  console.error("Failed to fetch user:", error);
+}
