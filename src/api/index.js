@@ -39,6 +39,19 @@ const saveToSessionStorage = () => {
 };
 
 /**
+ * Fetch the demo posts from the remote API.
+ */
+const fetchRemotePosts = async () => {
+  const response = await fetch(`${API_URL}/posts`);
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }
+
+  const data = await response.json();
+  return data.slice(0, 5); // Limit to 5 posts for demo
+};
+
+/**
  * Initialize the local store by fetching from JSONPlaceholder
  * @returns {Promise<Array>} A promise that resolves to an array of posts.
  */
@@ -53,17 +66,28 @@ const initializeStore = async () => {
 
   // If not in sessionStorage, fetch from API
   try {
-    const response = await fetch(`${API_URL}/posts`);
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-    const data = await response.json();
-    postsStore = data.slice(0, 5); // Limit to 5 posts for demo
+    postsStore = await fetchRemotePosts();
     isInitialized = true;
     saveToSessionStorage();
     return postsStore;
   } catch (error) {
     console.error('Error initializing store:', error);
+    throw error;
+  }
+};
+
+/**
+ * Hard reset the store by fetching a fresh copy from the remote API.
+ * @returns {Promise<Array>} A promise that resolves to a refreshed array of posts.
+ */
+export const hardResetPosts = async () => {
+  try {
+    postsStore = await fetchRemotePosts();
+    isInitialized = true;
+    saveToSessionStorage();
+    return [...postsStore];
+  } catch (error) {
+    console.error('Error hard resetting posts:', error);
     throw error;
   }
 };
